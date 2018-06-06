@@ -4,7 +4,10 @@
 
 #include <iostream>
 
-#define USE_EBO 1
+#define USE_EBO 0
+#define USE_WIRE_FRAME 0
+#define EXERCISE_1 0
+#define EXERCISE_2 1
 
 /// function prototypes
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -104,12 +107,35 @@ int main()
 	glDeleteShader(FragShader);
 
 
-		
+#if EXERCISE_1
+	float vertices[] = {
+		-0.5f, -0.5f, 0.0f,
+		0.5f, -0.5f, 0.0f,
+		0.0f,  0.5f, 0.0f,
+		-1.0f, -1.0f, 0.0f,
+		-1.0f, 0.0f, 0.0f,
+		-0.6f, 0.0f, 0.0f
+	};
+#elif EXERCISE_2
+	float vertices[] = {
+		-0.5f, -0.5f, 0.0f,
+		0.5f, -0.5f, 0.0f,
+		0.0f,  0.5f, 0.0f
+	};
+
+	float vertices2[] = {
+		-1.0f, -1.0f, 0.0f,
+		-1.0f, 0.0f, 0.0f,
+		-0.6f, 0.0f, 0.0f
+	};
+	
+#else
 	float vertices[] = {
 		-0.5f, -0.5f, 0.0f,
 		 0.5f, -0.5f, 0.0f,
 		 0.0f,  0.5f, 0.0f
 	};
+#endif
 
 	float sqVertices[] = {
 		-.5f,  .5f, 0.0f, // top left
@@ -125,9 +151,11 @@ int main()
 
 
 	// setup vao, vbo, ebo
-	unsigned int vao, vbo, ebo;
+	unsigned int vao, vao2, vbo, vbo2, ebo;
 	glGenVertexArrays(1, &vao);
+	glGenVertexArrays(1, &vao2);
 	glGenBuffers(1, &vbo);
+	glGenBuffers(1, &vbo2);
 	glGenBuffers(1, &ebo);
 
 
@@ -136,14 +164,13 @@ int main()
 #if USE_EBO
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(sqVertices), sqVertices, GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 #else
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 #endif
-
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
@@ -151,6 +178,21 @@ int main()
 	// unbind vertex array to prevent changes
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+
+#if EXERCISE_2
+	glBindVertexArray(vao2);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo2);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices2), vertices2, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
+#endif
+
+#if USE_WIRE_FRAME
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+#endif
 
 	// rendering loop
 	while (!glfwWindowShouldClose(window))
@@ -167,7 +209,15 @@ int main()
 #if USE_EBO
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 #else
+#if EXERCISE_1
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+#elif EXERCISE_2
 		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glBindVertexArray(vao2);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+#else
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+#endif
 #endif	
 
 		// end rendering
