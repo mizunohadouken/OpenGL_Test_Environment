@@ -8,6 +8,7 @@
 #define USE_WIRE_FRAME 0
 #define EXERCISE_1 0
 #define EXERCISE_2 1
+#define USE2SHADERS 1
 
 /// function prototypes
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -33,6 +34,12 @@ const char *fragShaderSrc = "#version 330 core\n"
 "	FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
 "}\n\0";
 
+const char *fragShaderSrc2 = "#version 330 core\n"
+"out vec4 FragColor;\n"
+"void main()\n"
+"{\n"
+"	FragColor = vec4(1.0f, 1.0f, 0.0f, 1.0f);\n"
+"}\n\0";
 
 int main()
 {
@@ -102,10 +109,38 @@ int main()
 		glGetShaderInfoLog(ShaderProgram, 512, NULL, infoLog);
 		std::cout << "ERROR:: Shader linking failed\n" << infoLog << std::endl;
 	}
+
+
+#if USE2SHADERS
+	unsigned int FragShader2, ShaderProgram2;
+
+	FragShader2 = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(FragShader2, 1, &fragShaderSrc2, NULL);
+	glCompileShader(FragShader2);
+	glGetShaderiv(FragShader2, GL_COMPILE_STATUS, &success);
+	if (!success)
+	{
+		glGetShaderInfoLog(FragShader2, 512, NULL, infoLog);
+		std::cout << "ERROR:: FragShade2 compilation failed\n" << infoLog << std::endl;
+	}
+
+	ShaderProgram2 = glCreateProgram();
+	glAttachShader(ShaderProgram2, VertexShader);
+	glAttachShader(ShaderProgram2, FragShader2);
+	glLinkProgram(ShaderProgram2);
+	glGetShaderiv(ShaderProgram, GL_LINK_STATUS, &success);
+	if (!success)
+	{
+		glGetShaderInfoLog(ShaderProgram2, 512, NULL, infoLog);
+		std::cout << "ERROR:: Shader linking failed\n" << infoLog << std :: endl;
+	}
+
+	glDeleteShader(FragShader2);
+#endif
+
 	// clean up shaders
 	glDeleteShader(VertexShader);
 	glDeleteShader(FragShader);
-
 
 #if EXERCISE_1
 	float vertices[] = {
@@ -213,6 +248,10 @@ int main()
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 #elif EXERCISE_2
 		glDrawArrays(GL_TRIANGLES, 0, 3);
+#if USE2SHADERS
+		glUseProgram(ShaderProgram2);
+#endif
+
 		glBindVertexArray(vao2);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 #else
