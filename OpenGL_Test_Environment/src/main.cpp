@@ -97,9 +97,11 @@ int main()
 	////
 	// load and create texture
 	////
-	unsigned int texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
+	unsigned int texture1, texture2;
+
+	// texture 1
+	glGenTextures(1, &texture1);
+	glBindTexture(GL_TEXTURE_2D, texture1);
 	// set texture wrapping/filtering options on currently bound object
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -107,6 +109,7 @@ int main()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	// load and generate the texture
 	int width, height, nrChannels;
+	stbi_set_flip_vertically_on_load(true);
 	unsigned char *data = stbi_load("res/textures/container.jpg", &width, &height, &nrChannels, 0);
 	if (data)
 	{
@@ -119,6 +122,35 @@ int main()
 	}
 	stbi_image_free(data);
 
+	// texture 2
+	glGenTextures(1, &texture2);
+	glBindTexture(GL_TEXTURE_2D, texture2);
+	// set texture wrapping/filtering options on currently bound object
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	// load and generate the texture
+	data = stbi_load("res/textures/awesomeface.png", &width, &height, &nrChannels, 0);
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "failed to load texture" << std::endl;
+	}
+	stbi_image_free(data);
+
+	// send textures to opengl
+	shaderClass.use();
+	int texture0_location = glGetUniformLocation(shaderClass.ID, "texture1");
+	glUniform1i(texture0_location, 0);
+	int texture1_location = glGetUniformLocation(shaderClass.ID, "texture2");
+	glUniform1i(texture1_location, 1);
+
+
 #if USE_WIRE_FRAME
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 #endif
@@ -129,15 +161,21 @@ int main()
 		// inputs
 		processInput(window);
 		
+		//
 		// render here
+		//
 		glClearColor(.2f, .2f, .2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
+
+		// bind textures
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texture1);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, texture2);
+
 		shaderClass.use();
-
-		glBindTexture(GL_TEXTURE_2D, texture);
 		glBindVertexArray(vao);
-
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 
@@ -145,6 +183,11 @@ int main()
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
+
+	// De-allocate resources
+	glDeleteVertexArrays(1, &vao);
+	glDeleteBuffers(1, &vbo);
+	glDeleteBuffers(1, &ebo);
 
 	glfwTerminate();
 	return 0;
