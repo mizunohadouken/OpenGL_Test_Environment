@@ -16,6 +16,8 @@ void processInput(GLFWwindow *window);
 const unsigned int scr_width = 800;
 const unsigned int scr_height = 600;
 
+float mixerVal = .0f;
+
 int main()
 {
 	// initialize glfw
@@ -151,6 +153,9 @@ int main()
 	glUniform1i(texture1_location, 1);
 
 
+
+
+
 #if USE_WIRE_FRAME
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 #endif
@@ -173,6 +178,10 @@ int main()
 		glBindTexture(GL_TEXTURE_2D, texture1);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, texture2);
+
+		int mixerLocation = glGetUniformLocation(shaderClass.ID, "mixer");
+		glUniform1f(mixerLocation, mixerVal);
+
 
 		shaderClass.use();
 		glBindVertexArray(vao);
@@ -204,5 +213,17 @@ void processInput(GLFWwindow * window)
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 	{
 		glfwSetWindowShouldClose(window, true);
+	}
+	if (glfwGetKey(window, GLFW_KEY_UP) ==  GLFW_PRESS)
+	{
+		mixerVal += .01f;
+		if (mixerVal >= 1.0f)
+			mixerVal = 1.0f;
+	}
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+	{
+		mixerVal -= .01f;
+		if (mixerVal <= 0.0f)
+			mixerVal = 0.0f;
 	}
 }
