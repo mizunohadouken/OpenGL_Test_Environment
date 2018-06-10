@@ -6,10 +6,12 @@
  
  out vec4 vertColor;
  out vec2 TexCoord;
+ 
+ uniform mat4 transformMat;
 
  void main()  
  {  
- 	gl_Position = aPos;
+ 	gl_Position = transformMat * aPos;
 	
 	vertColor = aColor;
 	TexCoord = aTexCoord;	

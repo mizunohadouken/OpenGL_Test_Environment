@@ -6,6 +6,10 @@
 #include "Shader.h"
 #include "vendor/stb_image/stb_image.h"
 
+#include "vendor/glm/glm.hpp"
+#include "vendor/glm/gtc/matrix_transform.hpp"
+#include "vendor/glm/gtc/type_ptr.hpp"
+
 #define USE_WIRE_FRAME 0
 
 /// function prototypes
@@ -17,6 +21,7 @@ const unsigned int scr_width = 800;
 const unsigned int scr_height = 600;
 
 float mixerVal = .0f;
+
 
 int main()
 {
@@ -152,14 +157,9 @@ int main()
 	int texture1_location = glGetUniformLocation(shaderClass.ID, "texture2");
 	glUniform1i(texture1_location, 1);
 
-
-
-
-
 #if USE_WIRE_FRAME
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 #endif
-
 	// rendering loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -181,6 +181,14 @@ int main()
 
 		int mixerLocation = glGetUniformLocation(shaderClass.ID, "mixer");
 		glUniform1f(mixerLocation, mixerVal);
+
+		glm::mat4 transform = glm::mat4(1.0f);
+		//	transform = glm::rotate(transform, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
+		//	transform = glm::scale(transform, glm::vec3(.5, .5, .5));
+		transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0, 0.0, 1.0));
+		transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
+		unsigned int transformLoc = glGetUniformLocation(shaderClass.ID, "transformMat");
+		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
 
 
 		shaderClass.use();
