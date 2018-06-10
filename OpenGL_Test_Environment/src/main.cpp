@@ -160,6 +160,7 @@ int main()
 #if USE_WIRE_FRAME
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 #endif
+
 	// rendering loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -183,17 +184,24 @@ int main()
 		glUniform1f(mixerLocation, mixerVal);
 
 		glm::mat4 transform = glm::mat4(1.0f);
-		//	transform = glm::rotate(transform, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
-		//	transform = glm::scale(transform, glm::vec3(.5, .5, .5));
-		transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0, 0.0, 1.0));
 		transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
+		transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0, 0.0, 1.0));
 		unsigned int transformLoc = glGetUniformLocation(shaderClass.ID, "transformMat");
 		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
 
-
-		shaderClass.use();
 		glBindVertexArray(vao);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+		// render second box
+		transform = glm::mat4(1.0f);
+		transform = glm::translate(transform, glm::vec3(-0.5f, 0.5f, 0.0f));
+		transform = glm::scale(transform, glm::vec3(sin(glfwGetTime())));
+		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
+
+		glBindVertexArray(vao);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+
 
 
 		// end rendering
