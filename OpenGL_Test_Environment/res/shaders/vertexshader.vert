@@ -7,11 +7,11 @@
  out vec4 vertColor;
  out vec2 TexCoord;
  
- uniform mat4 transformMat;
+ uniform mat4 mvpMat;
 
  void main()  
  {  
- 	gl_Position = transformMat * aPos;
+ 	gl_Position = mvpMat * aPos;
 	
 	vertColor = aColor;
 	TexCoord = aTexCoord;	
