@@ -1,4 +1,11 @@
 ﻿  main.cpp
-c:\users\andre\desktop\repos\opengl_test_environment\opengl_test_environment\src\main.cpp(249): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\andre\desktop\repos\opengl_test_environment\opengl_test_environment\src\main.cpp(316): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\andre\desktop\repos\opengl_test_environment\opengl_test_environment\src\main.cpp(230): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\andre\desktop\repos\opengl_test_environment\opengl_test_environment\src\main.cpp(299): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\andre\desktop\repos\opengl_test_environment\opengl_test_environment\src\main.cpp(300): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\andre\desktop\repos\opengl_test_environment\opengl_test_environment\src\main.cpp(304): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\andre\desktop\repos\opengl_test_environment\opengl_test_environment\src\main.cpp(305): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\andre\desktop\repos\opengl_test_environment\opengl_test_environment\src\main.cpp(306): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\andre\desktop\repos\opengl_test_environment\opengl_test_environment\src\main.cpp(307): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\andre\desktop\repos\opengl_test_environment\opengl_test_environment\src\main.cpp(333): warning C4244: '-=': conversion from 'double' to 'float', possible loss of data
+c:\users\andre\desktop\repos\opengl_test_environment\opengl_test_environment\src\main.cpp(342): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
   OpenGL_Test_Environment.vcxproj -> C:\Users\Andre\Desktop\Repos\OpenGL_Test_Environment\Debug\OpenGL_Test_Environment.exe
