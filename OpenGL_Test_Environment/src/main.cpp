@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include "Shader.h"
+#include "camera.h"
 #include "vendor/stb_image/stb_image.h"
 
 #include "vendor/glm/glm.hpp"
@@ -23,9 +24,7 @@ const unsigned int scr_width = 800;
 const unsigned int scr_height = 600;
 
 // camera
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
 // timing
 float deltaTime = 0.0f;
@@ -40,6 +39,7 @@ float fov = 45.0f;
 
 float mixerVal = .0f;
 float near = 1.0f;
+
 
 
 int main()
@@ -142,10 +142,9 @@ int main()
 	//
 	// setup vao, vbo, ebo
 	//
-	unsigned int vao, vbo, ebo;
+	unsigned int vao, vbo;
 	glGenVertexArrays(1, &vao);
 	glGenBuffers(1, &vbo);
-	glGenBuffers(1, &ebo);
 
 	glBindVertexArray(vao);
 
@@ -252,9 +251,7 @@ int main()
 		glBindVertexArray(vao);
 		// set up MVP
 		glm::mat4 view = glm::mat4(1.0f);
-		view = glm::lookAt(cameraPos,
-						   cameraPos + cameraFront,
-						   cameraUp);
+		view = camera.GetViewMatrix();
 		glm::mat4 projection = glm::mat4(1.0f);
 		projection = glm::perspective(glm::radians(fov), (float)scr_width / (float)scr_height, .1f, 100.0f);
 
@@ -280,7 +277,6 @@ int main()
 	// De-allocate resources
 	glDeleteVertexArrays(1, &vao);
 	glDeleteBuffers(1, &vbo);
-	glDeleteBuffers(1, &ebo);
 
 	glfwTerminate();
 	return 0;
@@ -306,35 +302,12 @@ void mouse_callback(GLFWwindow * window, double xpos, double ypos)
 	lastX = xpos;
 	lastY = ypos;
 
-	float sensitivity = 0.05f;
-	xoffset *= sensitivity;
-	yoffset *= sensitivity;
-
-	yaw += xoffset;
-	pitch += yoffset;
-
-	if (pitch > 89.0f)
-		pitch = 89.0f;
-	if (pitch < -89.0f)
-		pitch = -89.0f;
-
-	glm::vec3 front;
-	front.x = cos(glm::radians(pitch)) * cos(glm::radians(yaw));
-	front.y = sin(glm::radians(pitch));
-	front.z = cos(glm::radians(pitch)) * sin(glm::radians(yaw));
-	cameraFront = glm::normalize(front);
-
-
+	camera.ProcessMouseMovement(xoffset, yoffset);
 }
 
 void scroll_callback(GLFWwindow * window, double xoffset, double yoffset)
 {
-	if (fov >= 1.0f && fov <= 45.0f)
-		fov -= yoffset;
-	if (fov <= 1.0f)
-		fov = 1.0f;
-	if (fov >= 45.0f)
-		fov = 45.0f;
+	camera.ProcessMouseScroll(yoffset);
 }
 
 void processInput(GLFWwindow * window)
@@ -342,9 +315,7 @@ void processInput(GLFWwindow * window)
 	float cameraSpeed = 2.5 *deltaTime;
 
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-	{
 		glfwSetWindowShouldClose(window, true);
-	}
 	if (glfwGetKey(window, GLFW_KEY_UP) ==  GLFW_PRESS)
 	{
 		mixerVal += .01f;
@@ -358,11 +329,11 @@ void processInput(GLFWwindow * window)
 			mixerVal = 0.0f;
 	}
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		cameraPos += cameraFront * cameraSpeed;
+		camera.ProcessKeyboard(FORWARD, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		cameraPos -= cameraFront * cameraSpeed;
+		camera.ProcessKeyboard(BACKWARD, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp))* cameraSpeed;
+		camera.ProcessKeyboard(LEFT, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp))* cameraSpeed;
+		camera.ProcessKeyboard(RIGHT, deltaTime);
 }
